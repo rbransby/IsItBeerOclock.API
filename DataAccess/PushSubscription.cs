@@ -12,5 +12,7 @@ namespace IsItBeerOclock.API.DataAccess
         public string Endpoint { get; set; }
 
         public IEnumerable<PushSubscriptionKey> Keys { get; set; }
+
+        public TimeSpan TimeOffset { get; set; } 
     }
 }

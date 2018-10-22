@@ -7,6 +7,7 @@ using Lib.Net.Http.WebPush;
 using Lib.Net.Http.WebPush.Authentication;
 using System.Threading;
 using IsItBeerOclock.API.DataAccess;
+using IsItBeerOclock.API.Model;
 
 namespace IsItBeerOclock.API.Controllers
 {
@@ -21,17 +22,18 @@ namespace IsItBeerOclock.API.Controllers
             this._dataContext = dataContext;
         }
         [HttpPost]
-        public async Task<IActionResult> StoreSubscription([FromBody]Lib.Net.Http.WebPush.PushSubscription subscription)
+        public async Task<IActionResult> StoreSubscription([FromBody]PushSubscriptionDTO subscription)
         {
             var pushSubscription = new DataAccess.PushSubscription()
             {
-                Endpoint = subscription.Endpoint
+                Endpoint = subscription.PushSubscription.Endpoint,
+                TimeOffset = new TimeSpan(subscription.Timeoffset, 0, 0)
             };
 
             List<PushSubscriptionKey> keys = new List<PushSubscriptionKey>();
-            foreach (var key in subscription.Keys)
+            foreach (var key in subscription.PushSubscription.Keys)
             {
-                keys.Add(new PushSubscriptionKey { Endpoint = subscription.Endpoint, KeyType = key.Key, KeyValue = key.Value });
+                keys.Add(new PushSubscriptionKey { Endpoint = subscription.PushSubscription.Endpoint, KeyType = key.Key, KeyValue = key.Value });
             }
 
             _dataContext.PushSubscriptions.Add(pushSubscription);

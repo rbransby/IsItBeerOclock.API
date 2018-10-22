@@ -1,4 +1,6 @@
 ﻿using IsItBeerOclock.API.DataAccess;
+using Lib.Net.Http.WebPush;
+using Lib.Net.Http.WebPush.Authentication;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
@@ -50,7 +52,7 @@ namespace IsItBeerOclock.API.HostedService
             _timer?.Dispose();
         }
 
-        private async Task SendNotificationAsync(PushSubscription subscription, PushMessage message, CancellationToken cancellationToken)
+        private async Task SendNotificationAsync(Lib.Net.Http.WebPush.PushSubscription subscription, PushMessage message, CancellationToken cancellationToken)
         {
             var _pushClient = new PushServiceClient();
             _pushClient.DefaultAuthentication = new VapidAuthentication("BP3KYW8aPpClaCjP2MUceUNTwqBSaK88kTnl6SWg0k134zAy_dNNub8LfGHo83bbkm-LUGAd_aLKM0z_4cpUlY8", "SSvrSz8WiLxNJB4SOZXiBs12n3VPLyftqHR05xpobGo");
