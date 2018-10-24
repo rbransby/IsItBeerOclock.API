@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using IsItBeerOclock.API.DataAccess;
+using IsItBeerOclock.API.HostedService;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -33,6 +34,7 @@ namespace IsItBeerOclock.API
             var connection = @"Data Source=IsItBeerOclock.db";
             services.AddDbContext<DataContext>
                 (options => options.UseSqlite(connection));
+            services.AddHostedService<SendNotifications>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

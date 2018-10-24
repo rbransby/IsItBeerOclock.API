@@ -14,13 +14,13 @@ namespace IsItBeerOclock.API.HostedService
     public class SendNotifications : IHostedService, IDisposable
     {
         private readonly ILogger _logger;
-        private Timer _timer;
-        private DataContext _dataContext;
+        private Timer _timer;        
+        private readonly DateTime DATE_TO_NOTIFY = new DateTime(2018, 10, 24, 22, 00, 00);
 
-        public SendNotifications(ILogger<SendNotifications> logger, DataContext dataContext)
+        public SendNotifications(ILogger<SendNotifications> logger)
         {
             _logger = logger;
-            _dataContext = dataContext;
+            
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -28,14 +28,23 @@ namespace IsItBeerOclock.API.HostedService
             _logger.LogInformation("Timed Background Service is starting.");
 
             _timer = new Timer(DoWork, null, TimeSpan.Zero,
-                TimeSpan.FromSeconds(30));
+                TimeSpan.FromSeconds(120));
 
             return Task.CompletedTask;
         }
 
         private void DoWork(object state)
         {
-            _logger.LogInformation("Timed Background Service is working.");
+            DataContext context = new DataContext();
+            // get all subscribers for which the trigger datetime is within 30 seconds
+            double totalMinutesSeperation = DATE_TO_NOTIFY.Subtract(DateTime.UtcNow).TotalMinutes;
+
+            if (Math.Abs(totalMinutesSeperation) < (15 * 60))
+            {
+                var hoursSeperation = totalMinutesSeperation / 60;
+                // less than 15 hours either side of UTC, so lets start checking
+                var subscribers = context.PushSubscriptions.Where(ps => Math.Abs(ps.TimeOffset.TotalHours - hoursSeperation) < (1D / 60D));
+            }
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
