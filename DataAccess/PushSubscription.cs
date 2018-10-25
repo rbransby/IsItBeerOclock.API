@@ -14,5 +14,14 @@ namespace IsItBeerOclock.API.DataAccess
         public IEnumerable<PushSubscriptionKey> Keys { get; set; }
 
         public TimeSpan TimeOffset { get; set; } 
+
+        public Lib.Net.Http.WebPush.PushSubscription ToPushSubscription()
+        {
+            return new Lib.Net.Http.WebPush.PushSubscription()
+            {
+                Endpoint = this.Endpoint,
+                Keys = this.Keys.ToDictionary(psk => psk.KeyType, psk => psk.KeyValue)
+            };
+        }
     }
 }
