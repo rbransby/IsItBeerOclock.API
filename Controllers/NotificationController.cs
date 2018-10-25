@@ -17,12 +17,17 @@ namespace IsItBeerOclock.API.Controllers
     {
         private DataContext _dataContext;
 
+        public NotificationController(DataContext context)
+        {
+            this._dataContext = context;
+        }
+
         [HttpPost]
         public async Task<IActionResult> SendNotification([FromBody]PushMessage pushMessage)
         {
             foreach (var pushSubscription in _dataContext.PushSubscriptions)
             {
-                await SendNotificationAsync(pushSubscription.ToPushSubscription(), pushMessage, CancellationToken.None);
+                await SendNotificationAsync(pushSubscription.ToPushSubscription(_dataContext.PushSubscriptionKeys.Where(psk => psk.Endpoint == pushSubscription.Endpoint)), pushMessage, CancellationToken.None);
             }
             
             return NoContent();
