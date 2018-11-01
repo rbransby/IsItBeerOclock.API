@@ -15,12 +15,12 @@ namespace IsItBeerOclock.API.DataAccess
 
         public TimeSpan TimeOffset { get; set; } 
 
-        public Lib.Net.Http.WebPush.PushSubscription ToPushSubscription()
+        public Lib.Net.Http.WebPush.PushSubscription ToPushSubscription(IEnumerable<PushSubscriptionKey> keys)
         {
             return new Lib.Net.Http.WebPush.PushSubscription()
             {
                 Endpoint = this.Endpoint,
-                Keys = this.Keys.ToDictionary(psk => psk.KeyType, psk => psk.KeyValue)
+                Keys = keys.ToDictionary(psk => psk.KeyType, psk => psk.KeyValue)
             };
         }
     }
