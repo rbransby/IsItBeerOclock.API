@@ -1,4 +1,5 @@
 ﻿using IsItBeerOclock.API.DataAccess;
+using IsItBeerOclock.API.PushNotifications;
 using Lib.Net.Http.WebPush;
 using Lib.Net.Http.WebPush.Authentication;
 using Microsoft.Extensions.Hosting;
@@ -38,12 +39,23 @@ namespace IsItBeerOclock.API.HostedService
             DataContext context = new DataContext();
             // get all subscribers for which the trigger datetime is within 30 seconds
             double totalMinutesSeperation = DATE_TO_NOTIFY.Subtract(DateTime.UtcNow).TotalMinutes;
-
+            IEnumerable<DataAccess.PushSubscription> subscribers = new List<DataAccess.PushSubscription>();
             if (Math.Abs(totalMinutesSeperation) < (15 * 60))
             {
                 var hoursSeperation = totalMinutesSeperation / 60;
                 // less than 15 hours either side of UTC, so lets start checking
-                var subscribers = context.PushSubscriptions.Where(ps => Math.Abs(ps.TimeOffset.TotalHours - hoursSeperation) < (1D / 60D));
+                subscribers = context.PushSubscriptions.Where(ps => Math.Abs(ps.TimeOffset.TotalHours - hoursSeperation) < (1D / 60D));
+            }
+            var pushNotificationManager = new PushNotificationManager();
+            var pushMessage = new PushMessage("ITS BEER TIME")
+            {
+                Topic = "Beer",                
+                Urgency = PushMessageUrgency.Normal,
+            };
+
+            foreach (var pushSubscription in subscribers)
+            {
+                pushNotificationManager.SendNotificationAsync(pushSubscription.ToPushSubscription(), pushMessage, CancellationToken.None).Wait();
             }
         }
 
