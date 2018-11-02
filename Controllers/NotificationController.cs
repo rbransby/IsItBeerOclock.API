@@ -27,7 +27,7 @@ namespace IsItBeerOclock.API.Controllers
         {
             foreach (var pushSubscription in _dataContext.PushSubscriptions)
             {
-                await SendNotificationAsync(pushSubscription.ToPushSubscription(), pushMessage, CancellationToken.None);
+                await SendNotificationAsync(pushSubscription.ToPushSubscription(_dataContext.PushSubscriptionKeys.Where(psk => psk.Endpoint == pushSubscription.Endpoint)), pushMessage, CancellationToken.None);
             }
             
             return NoContent();
@@ -49,13 +49,4 @@ namespace IsItBeerOclock.API.Controllers
 
     }
 }
-
-using IsItBeerOclock.API.Model;
-using IsItBeerOclock.API.DataAccess;
-using IsItBeerOclock.API.PushNotifications;
-
-            var pushNotificationManager = new PushNotificationManager();
-            foreach (var pushSubscription in _dataContext.PushSubscriptions)
-            {
-                await pushNotificationManager.SendNotificationAsync(pushSubscription.ToPushSubscription(), pushMessage, CancellationToken.None);
-        }        
+   

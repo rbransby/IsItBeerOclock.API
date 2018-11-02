@@ -55,7 +55,7 @@ namespace IsItBeerOclock.API.HostedService
 
             foreach (var pushSubscription in subscribers)
             {
-                pushNotificationManager.SendNotificationAsync(pushSubscription.ToPushSubscription(), pushMessage, CancellationToken.None).Wait();
+                pushNotificationManager.SendNotificationAsync(pushSubscription.ToPushSubscription(context.PushSubscriptionKeys.Where(psk => psk.Endpoint == pushSubscription.Endpoint)), pushMessage, CancellationToken.None).Wait();
             }
         }
 
