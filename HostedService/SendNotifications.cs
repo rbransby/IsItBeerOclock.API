@@ -16,7 +16,7 @@ namespace IsItBeerOclock.API.HostedService
     {
         private readonly ILogger _logger;
         private Timer _timer;        
-        private readonly DateTime DATE_TO_NOTIFY = new DateTime(2018, 11, 02, 16, 00, 00);
+        private readonly DateTime DATE_TO_NOTIFY = new DateTime(2018, 11, 09, 16, 00, 00);
 
         public SendNotifications(ILogger<SendNotifications> logger)
         {
