@@ -15,13 +15,13 @@ namespace IsItBeerOclock.API.HostedService
     public class SendNotifications : IHostedService, IDisposable
     {
         private readonly ILogger _logger;
-        private Timer _timer;        
-        private readonly DateTime DATE_TO_NOTIFY = new DateTime(2018, 11, 16, 16, 00, 00);
+        private Timer _timer;                
+        private readonly DateTime TimeToNotify = new DateTime(2018, 11, 16, 16, 00, 00);
+        private readonly DayOfWeek DayOfWeekToNotify = DayOfWeek.Friday;
 
         public SendNotifications(ILogger<SendNotifications> logger)
         {
-            _logger = logger;
-            
+            _logger = logger;                        
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -38,7 +38,9 @@ namespace IsItBeerOclock.API.HostedService
         {
             DataContext context = new DataContext();
             // get all subscribers for which the trigger datetime is within 30 seconds
-            double totalMinutesSeperation = DATE_TO_NOTIFY.Subtract(DateTime.UtcNow).TotalMinutes;
+            var dateOfNextDay = GetNextWeekday(DayOfWeekToNotify);
+            var dateToNotify = new DateTime(dateOfNextDay.Year, dateOfNextDay.Month, dateOfNextDay.Day, TimeToNotify.Hour, TimeToNotify.Minute, TimeToNotify.Second);
+            double totalMinutesSeperation = dateToNotify.Subtract(DateTime.UtcNow).TotalMinutes;
             IEnumerable<DataAccess.PushSubscription> subscribers = new List<DataAccess.PushSubscription>();
             if (Math.Abs(totalMinutesSeperation) < (15 * 60))
             {
@@ -85,6 +87,14 @@ namespace IsItBeerOclock.API.HostedService
             {
                 //_logger?.LogError(ex, "Failed requesting push message delivery to {0}.", subscription.Endpoint);
             }
+        }
+
+        private DateTime GetNextWeekday(DayOfWeek day)
+        {
+            DateTime result = DateTime.Now;
+            while (result.DayOfWeek != day)
+                result = result.AddDays(1);
+            return result;
         }
     }
 }
